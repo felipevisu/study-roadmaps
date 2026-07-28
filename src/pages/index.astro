@@ -5,28 +5,39 @@ import { allRoadmaps, weeksOf, stats } from '../lib/data'
 
 const roadmaps = await allRoadmaps()
 const cards = await Promise.all(
-  roadmaps.map(async (r) => ({ roadmap: r, stats: stats(await weeksOf(r.id)) })),
+  roadmaps.map(async (r) => ({ roadmap: r, weeks: await weeksOf(r.id) })),
 )
+const totals = cards.map((c) => stats(c.weeks))
+const totalWeeks = totals.reduce((n, s) => n + s.total, 0)
+const totalDone = totals.reduce((n, s) => n + s.done, 0)
 ---
 
-<Base title="study-plan — roadmaps">
+<Base title="Study-Plan" status={`${totalDone}/${totalWeeks} semanas`}>
   <div class="wrap">
     <section class="hero">
-      <p class="eyebrow">Roadmaps de estudo</p>
-      <h1>Uma POC por semana, registrada.</h1>
-      <p>
-        Cada roadmap tem uma página por semana: o plano, o que foi construído e
-        as POCs publicadas. Progresso vem do frontmatter dos arquivos markdown.
+      <p class="kicker">
+        <span>Roadmaps de estudo</span>
+        <span>{cards.length} ativos</span>
+      </p>
+      <h1 class="mono-huge">Uma POC por semana</h1>
+      <p class="hero-sub">
+        Cada semana é um arquivo markdown: o plano, o que foi construído e as POCs
+        publicadas. O progresso sai do frontmatter no build — <b>sem banco, sem admin</b>.
       </p>
     </section>
 
     <section class="cards">
       {
-        cards.map(({ roadmap, stats: s }) => (
+        cards.map(({ roadmap, weeks }, i) => (
           <a class="card" href={`/${roadmap.id}/`} style={`--accent: ${roadmap.data.accent}`}>
-            <h2>{roadmap.data.title}</h2>
-            <p class="sub">{roadmap.data.subtitle}</p>
-            <Progress {...s} compact />
+            <div class="card-top">
+              <div>
+                <h2>{roadmap.data.title}</h2>
+                <p class="sub">{roadmap.data.subtitle}</p>
+              </div>
+              <div class="pct">{totals[i].percent}%</div>
+            </div>
+            <Progress weeks={weeks} />
           </a>
         ))
       }

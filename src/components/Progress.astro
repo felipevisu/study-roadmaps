@@ -1,39 +1,48 @@
 ---
+import { stats, type Week } from '../lib/data'
+
 interface Props {
-  done: number
-  doing: number
-  total: number
-  skipped: number
-  percent: number
-  pocs?: number
-  compact?: boolean
+  weeks: Week[]
+  /** hide the numbers under the cells */
+  bare?: boolean
 }
 
-const { done, doing, total, skipped, percent, pocs, compact = false } = Astro.props
-
-// The striped segment sits right after the solid one, so "doing" reads as partial credit.
-const counted = Math.max(total - skipped, 1)
-const doingPct = Math.round((doing / counted) * 100)
+const { weeks, bare = false } = Astro.props
+const s = stats(weeks)
 ---
 
-<div>
+<div class="gauge">
   <div
-    class="bar"
+    class="gauge-cells"
     role="progressbar"
-    aria-valuenow={percent}
+    aria-valuenow={s.percent}
     aria-valuemin="0"
     aria-valuemax="100"
-    aria-label={`${percent}% concluído`}
+    aria-label={`${s.percent}% concluído, ${s.done} de ${s.total} semanas`}
   >
-    <i style={`width: ${percent}%`}></i>
-    <i class="is-doing" style={`width: ${doingPct}%`}></i>
+    {weeks.map((w) => <span data-s={w.data.status} title={`Semana ${w.data.week}`} />)}
   </div>
 
-  <div class="metrics">
-    <span><b>{percent}%</b> concluído</span>
-    <span><b>{done}</b>/{total} semanas</span>
-    {doing > 0 && <span><b>{doing}</b> em andamento</span>}
-    {!compact && skipped > 0 && <span><b>{skipped}</b> puladas</span>}
-    {!compact && pocs !== undefined && <span><b>{pocs}</b> POCs publicadas</span>}
-  </div>
+  {
+    !bare && (
+      <div class="gauge-legend">
+        <span>
+          <b>{s.done}</b>/{s.total} semanas
+        </span>
+        {s.doing > 0 && (
+          <span>
+            <b>{s.doing}</b> em andamento
+          </span>
+        )}
+        {s.skipped > 0 && (
+          <span>
+            <b>{s.skipped}</b> pulada{s.skipped > 1 ? 's' : ''}
+          </span>
+        )}
+        <span>
+          <b>{s.pocs}</b> POCs
+        </span>
+      </div>
+    )
+  }
 </div>

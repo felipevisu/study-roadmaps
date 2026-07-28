@@ -4,10 +4,10 @@ export type Week = CollectionEntry<'weeks'>
 export type Roadmap = CollectionEntry<'roadmaps'>
 
 export const STATUS = {
-  todo: { label: 'A fazer', className: 'todo' },
-  doing: { label: 'Em andamento', className: 'doing' },
-  done: { label: 'Concluída', className: 'done' },
-  skipped: { label: 'Pulada', className: 'skipped' },
+  todo: { label: 'A fazer', className: 'todo', box: '[ ]' },
+  doing: { label: 'Em andamento', className: 'doing', box: '[~]' },
+  done: { label: 'Concluída', className: 'done', box: '[x]' },
+  skipped: { label: 'Pulada', className: 'skipped', box: '[-]' },
 } as const
 
 /** Weeks of one roadmap, ordered. */

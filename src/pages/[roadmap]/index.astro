@@ -17,20 +17,33 @@ const { roadmap } = Astro.props
 const weeks = await weeksOf(roadmap.id)
 const s = stats(weeks)
 const { Content } = await render(roadmap)
+
+const next =
+  weeks.find((w) => w.data.status === 'doing') ?? weeks.find((w) => w.data.status === 'todo')
 ---
 
 <Base
-  title={`${roadmap.data.title} — study-plan`}
+  title={`${roadmap.data.title} — Study-Plan`}
   accent={roadmap.data.accent}
-  crumbs={[{ label: roadmap.id }]}
+  status={`Roadmap / ${roadmap.id} — ${s.percent}%`}
 >
   <div class="wrap">
     <section class="hero">
-      <p class="eyebrow">{roadmap.data.subtitle}</p>
-      <h1>{roadmap.data.title}</h1>
-      <div style="margin-top: 1.75rem; max-width: 34rem">
-        <Progress {...s} pocs={s.pocs} />
-      </div>
+      <p class="kicker">
+        <span>{roadmap.data.subtitle}</span>
+        <span>{s.percent}% concluído</span>
+      </p>
+      <h1 class="mono-huge">{roadmap.data.title}</h1>
+
+      <Progress weeks={weeks} />
+
+      {
+        next && (
+          <p class="hero-sub" style="margin-top: 1.5rem">
+            Próxima: <b>{String(next.data.week).padStart(2, '0')} {next.data.title}</b>
+          </p>
+        )
+      }
     </section>
 
     <section>

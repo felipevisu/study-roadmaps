@@ -17,7 +17,7 @@ src/content/
   weeks/<id>/NN-slug.md   # uma semana: frontmatter de progresso + plano + diário
 ```
 
-`AWS.md` e `RAG.md` na raiz são os originais. O site não os lê — foram
+`roads/AWS.md` e `roads/RAG.md` são os originais. O site não os lê — foram
 divididos em `src/content/weeks/`. Servem como referência.
 
 ## Rotina semanal
@@ -47,10 +47,15 @@ de sagrado nele.
 
 ### Como o progresso é calculado
 
-- Barra sólida: `done / (total − skipped)`
-- Barra listrada logo depois: semanas em `doing`
-- `skipped` sai do denominador, então a barra ainda chega a 100%
-- Contador de POCs: soma de `pocs` de todas as semanas
+A barra tem **uma célula por semana**, não uma porcentagem esticada:
+
+- célula preenchida com o accent = `done`
+- célula listrada = `doing`
+- célula vazia = `todo`
+- célula cortada na diagonal = `skipped`
+
+O `%` do topo é `done / (total − skipped)` — semanas puladas saem do
+denominador, então a barra ainda chega a 100%.
 
 ## Adicionar um roadmap novo
 
@@ -62,7 +67,15 @@ de sagrado nele.
 
 Nenhum código muda. As rotas, a home e as barras aparecem sozinhas no próximo build.
 
-O `accent` colore aquele roadmap inteiro (barra, links, hover, favicon-dot).
+O `accent` colore aquele roadmap inteiro (células da barra, faixas de fase,
+numeral gigante, hover). **Escolha uma cor viva e clara** — o texto sobre os
+blocos de accent é sempre preto, então accent escuro fica ilegível.
+
+## Estilo
+
+Brutalista editorial: sem border-radius, réguas duras, numerais gigantes,
+accent chapado. Segue `prefers-color-scheme` — papel/tinta no claro, invertido
+no escuro. Tudo em `src/styles/global.css`, sem framework de CSS.
 
 ## Deploy
 
