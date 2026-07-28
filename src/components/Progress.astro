@@ -1,0 +1,39 @@
+---
+interface Props {
+  done: number
+  doing: number
+  total: number
+  skipped: number
+  percent: number
+  pocs?: number
+  compact?: boolean
+}
+
+const { done, doing, total, skipped, percent, pocs, compact = false } = Astro.props
+
+// The striped segment sits right after the solid one, so "doing" reads as partial credit.
+const counted = Math.max(total - skipped, 1)
+const doingPct = Math.round((doing / counted) * 100)
+---
+
+<div>
+  <div
+    class="bar"
+    role="progressbar"
+    aria-valuenow={percent}
+    aria-valuemin="0"
+    aria-valuemax="100"
+    aria-label={`${percent}% concluído`}
+  >
+    <i style={`width: ${percent}%`}></i>
+    <i class="is-doing" style={`width: ${doingPct}%`}></i>
+  </div>
+
+  <div class="metrics">
+    <span><b>{percent}%</b> concluído</span>
+    <span><b>{done}</b>/{total} semanas</span>
+    {doing > 0 && <span><b>{doing}</b> em andamento</span>}
+    {!compact && skipped > 0 && <span><b>{skipped}</b> puladas</span>}
+    {!compact && pocs !== undefined && <span><b>{pocs}</b> POCs publicadas</span>}
+  </div>
+</div>

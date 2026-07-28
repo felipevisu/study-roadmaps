@@ -1,0 +1,81 @@
+---
+import { render } from 'astro:content'
+import Base from '../../layouts/Base.astro'
+import { allRoadmaps, weeksOf, weekSlug, STATUS } from '../../lib/data'
+
+export async function getStaticPaths() {
+  const roadmaps = await allRoadmaps()
+  const paths = []
+
+  for (const roadmap of roadmaps) {
+    const weeks = await weeksOf(roadmap.id)
+    weeks.forEach((week, i) => {
+      paths.push({
+        params: { roadmap: roadmap.id, week: weekSlug(week) },
+        props: { roadmap, week, prev: weeks[i - 1], next: weeks[i + 1] },
+      })
+    })
+  }
+  return paths
+}
+
+const { roadmap, week, prev, next } = Astro.props
+const { Content } = await render(week)
+const status = STATUS[week.data.status]
+const fmt = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long' })
+---
+
+<Base
+  title={`Semana ${week.data.week}: ${week.data.title} — ${roadmap.data.title}`}
+  accent={roadmap.data.accent}
+  crumbs={[
+    { label: roadmap.id, href: `/${roadmap.id}/` },
+    { label: `semana ${week.data.week}` },
+  ]}
+>
+  <div class="wrap">
+    <header class="week-head">
+      <p class="eyebrow">
+        Semana {String(week.data.week).padStart(2, '0')}
+        {week.data.phase && ` · ${week.data.phase}`}
+      </p>
+      <h1>{week.data.title}</h1>
+      <p class={`badge ${status.className}`}>
+        {status.label}
+        {week.data.done_at && ` · ${fmt.format(week.data.done_at)}`}
+      </p>
+    </header>
+
+    <article class="prose">
+      <Content />
+    </article>
+
+    <section class="section">
+      <h2>POCs</h2>
+      {
+        week.data.pocs.length === 0 ? (
+          <p class="empty">Nada publicado nesta semana ainda.</p>
+        ) : (
+          <ul class="pocs">
+            {week.data.pocs.map((p) =>
+              p.url ? (
+                <li>
+                  <a href={p.url}>{p.label}</a>
+                </li>
+              ) : (
+                <li>
+                  <span>{p.label}</span>
+                </li>
+              ),
+            )}
+          </ul>
+        )
+      }
+    </section>
+
+    <nav class="pager">
+      {prev ? <a href={`/${roadmap.id}/${weekSlug(prev)}/`}>← {prev.data.title}</a> : <span />}
+      {next ? <a href={`/${roadmap.id}/${weekSlug(next)}/`}>{next.data.title} →</a> : <span />}
+    </nav>
+  </div>
+</Base>

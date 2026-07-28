@@ -1,0 +1,52 @@
+---
+import '../styles/global.css'
+
+interface Crumb {
+  label: string
+  href?: string
+}
+
+interface Props {
+  title: string
+  accent?: string
+  crumbs?: Crumb[]
+}
+
+const { title, accent, crumbs = [] } = Astro.props
+---
+
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <link rel="icon" href="data:," />
+  </head>
+  <body style={accent ? `--accent: ${accent}` : undefined}>
+    <header class="site-head">
+      <div class="wrap">
+        <a class="brand" href="/">study-plan</a>
+        {
+          crumbs.length > 0 && (
+            <nav class="crumbs">
+              {crumbs.map((c) => (
+                <>
+                  <span>/</span>
+                  {c.href ? <a href={c.href}>{c.label}</a> : <em>{c.label}</em>}
+                </>
+              ))}
+            </nav>
+          )
+        }
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="site-foot">
+      <div class="wrap">Editado em markdown. Um arquivo por semana.</div>
+    </footer>
+  </body>
+</html>

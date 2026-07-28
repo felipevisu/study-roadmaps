@@ -1,0 +1,47 @@
+---
+import { render } from 'astro:content'
+import Base from '../../layouts/Base.astro'
+import Progress from '../../components/Progress.astro'
+import WeekList from '../../components/WeekList.astro'
+import { allRoadmaps, weeksOf, stats } from '../../lib/data'
+
+export async function getStaticPaths() {
+  const roadmaps = await allRoadmaps()
+  return roadmaps.map((roadmap) => ({
+    params: { roadmap: roadmap.id },
+    props: { roadmap },
+  }))
+}
+
+const { roadmap } = Astro.props
+const weeks = await weeksOf(roadmap.id)
+const s = stats(weeks)
+const { Content } = await render(roadmap)
+---
+
+<Base
+  title={`${roadmap.data.title} — study-plan`}
+  accent={roadmap.data.accent}
+  crumbs={[{ label: roadmap.id }]}
+>
+  <div class="wrap">
+    <section class="hero">
+      <p class="eyebrow">{roadmap.data.subtitle}</p>
+      <h1>{roadmap.data.title}</h1>
+      <div style="margin-top: 1.75rem; max-width: 34rem">
+        <Progress {...s} pocs={s.pocs} />
+      </div>
+    </section>
+
+    <section>
+      <WeekList roadmap={roadmap.id} weeks={weeks} />
+    </section>
+
+    <section class="section">
+      <h2>Regras e referências</h2>
+      <div class="prose">
+        <Content />
+      </div>
+    </section>
+  </div>
+</Base>

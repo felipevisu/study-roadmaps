@@ -1,0 +1,35 @@
+---
+import Base from '../layouts/Base.astro'
+import Progress from '../components/Progress.astro'
+import { allRoadmaps, weeksOf, stats } from '../lib/data'
+
+const roadmaps = await allRoadmaps()
+const cards = await Promise.all(
+  roadmaps.map(async (r) => ({ roadmap: r, stats: stats(await weeksOf(r.id)) })),
+)
+---
+
+<Base title="study-plan — roadmaps">
+  <div class="wrap">
+    <section class="hero">
+      <p class="eyebrow">Roadmaps de estudo</p>
+      <h1>Uma POC por semana, registrada.</h1>
+      <p>
+        Cada roadmap tem uma página por semana: o plano, o que foi construído e
+        as POCs publicadas. Progresso vem do frontmatter dos arquivos markdown.
+      </p>
+    </section>
+
+    <section class="cards">
+      {
+        cards.map(({ roadmap, stats: s }) => (
+          <a class="card" href={`/${roadmap.id}/`} style={`--accent: ${roadmap.data.accent}`}>
+            <h2>{roadmap.data.title}</h2>
+            <p class="sub">{roadmap.data.subtitle}</p>
+            <Progress {...s} compact />
+          </a>
+        ))
+      }
+    </section>
+  </div>
+</Base>

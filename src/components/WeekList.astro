@@ -1,0 +1,46 @@
+---
+import { STATUS, byPhase, weekSlug, type Week } from '../lib/data'
+
+interface Props {
+  roadmap: string
+  weeks: Week[]
+}
+
+const { roadmap, weeks } = Astro.props
+const groups = byPhase(weeks)
+const fmt = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short' })
+---
+
+{
+  groups.map((g) => (
+    <>
+      {g.phase && <h2 class="phase">{g.phase}</h2>}
+      <ul class="weeks">
+        {g.weeks.map((w) => (
+          <li>
+            <a
+              class="week-row"
+              data-status={w.data.status}
+              href={`/${roadmap}/${weekSlug(w)}/`}
+            >
+              <span class="week-num">
+                <span
+                  class={`dot ${STATUS[w.data.status].className}`}
+                  title={STATUS[w.data.status].label}
+                />
+                {String(w.data.week).padStart(2, '0')}
+              </span>
+              <span class="week-title">{w.data.title}</span>
+              <span class="week-meta">
+                {w.data.pocs.length > 0 &&
+                  `${w.data.pocs.length} POC${w.data.pocs.length > 1 ? 's' : ''}`}
+                {w.data.pocs.length > 0 && w.data.done_at && ' · '}
+                {w.data.done_at && fmt.format(w.data.done_at)}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </>
+  ))
+}
