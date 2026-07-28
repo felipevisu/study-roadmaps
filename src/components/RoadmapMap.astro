@@ -1,0 +1,67 @@
+---
+import { STATUS, weekSlug, type Week } from '../lib/data'
+
+interface Props {
+  roadmap: string
+  weeks: Week[]
+}
+
+const { roadmap, weeks } = Astro.props
+
+const COLS = 5
+
+// Serpentine layout: rows alternate direction so the path snakes without
+// ever jumping across the board. Links are assigned in FLOW order, then odd
+// rows get reversed for DOM placement — that way the grid needs no rtl hacks.
+type Node = { week: Week; link: 'next' | 'down' | null }
+
+const rows: { rtl: boolean; offset: number; nodes: Node[] }[] = []
+
+for (let i = 0; i < weeks.length; i += COLS) {
+  const slice = weeks.slice(i, i + COLS)
+  const rtl = (i / COLS) % 2 === 1
+
+  const nodes: Node[] = slice.map((week, j) => ({
+    week,
+    link:
+      i + j === weeks.length - 1 ? null : j === slice.length - 1 ? 'down' : 'next',
+  }))
+
+  rows.push({
+    rtl,
+    // a short final row on a reversed pass has to hug the right edge,
+    // otherwise the down-arrow from the row above points at empty space
+    offset: rtl ? COLS - nodes.length : 0,
+    nodes: rtl ? nodes.reverse() : nodes,
+  })
+}
+
+const nn = (n: number) => String(n).padStart(2, '0')
+---
+
+<div class="map-scroll">
+  <div class="map">
+    {
+      rows.map((row) => (
+        <div class="map-row" data-dir={row.rtl ? 'rtl' : 'ltr'}>
+          {row.nodes.map((n, j) => (
+            <a
+              class="node"
+              href={`/${roadmap}/${weekSlug(n.week)}/`}
+              data-status={n.week.data.status}
+              data-link={n.link}
+              style={j === 0 && row.offset ? `grid-column-start: ${row.offset + 1}` : undefined}
+            >
+              <span class="node-n">{nn(n.week.data.week)}</span>
+              <span class="node-t">{n.week.data.title}</span>
+              <span class="node-s">
+                {STATUS[n.week.data.status].label}
+                {n.week.data.pocs.length > 0 && ` · ${n.week.data.pocs.length} POC`}
+              </span>
+            </a>
+          ))}
+        </div>
+      ))
+    }
+  </div>
+</div>

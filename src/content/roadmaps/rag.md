@@ -1,7 +1,7 @@
 ---
 title: "RAG e Avaliação de Agentes"
 subtitle: "20 PoCs — da régua à produção"
-accent: "#00e5ff"
+accent: "#5b3fd6"
 order: 2
 source: "RAG.md"
 ---

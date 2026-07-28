@@ -1,7 +1,7 @@
 ---
 title: "AWS Solutions Architect Associate"
 subtitle: "SAA-C03 — 20 POCs, uma por semana"
-accent: "#ff9900"
+accent: "#c2670a"
 order: 1
 source: "AWS.md"
 ---

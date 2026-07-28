@@ -2,6 +2,7 @@
 import { render } from 'astro:content'
 import Base from '../../layouts/Base.astro'
 import Progress from '../../components/Progress.astro'
+import RoadmapMap from '../../components/RoadmapMap.astro'
 import WeekList from '../../components/WeekList.astro'
 import { allRoadmaps, weeksOf, stats } from '../../lib/data'
 
@@ -33,7 +34,7 @@ const next =
         <span>{roadmap.data.subtitle}</span>
         <span>{s.percent}% concluído</span>
       </p>
-      <h1 class="mono-huge">{roadmap.data.title}</h1>
+      <h1 class="page-title">{roadmap.data.title}</h1>
 
       <Progress weeks={weeks} />
 
@@ -46,7 +47,14 @@ const next =
       }
     </section>
 
-    <section>
+    <section class="section">
+      <h2>O caminho</h2>
+      <p class="map-hint">semana 01 → {String(weeks.length).padStart(2, '0')} · clique em qualquer bloco</p>
+      <RoadmapMap roadmap={roadmap.id} weeks={weeks} />
+    </section>
+
+    <section class="section">
+      <h2>Semana a semana</h2>
       <WeekList roadmap={roadmap.id} weeks={weeks} />
     </section>
 
