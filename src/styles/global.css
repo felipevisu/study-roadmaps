@@ -608,6 +608,14 @@ h1.week-h1 {
 
 .prose pre code { background: none; padding: 0; }
 
+/* shiki dual themes: switch token colors to the dark palette */
+@media (prefers-color-scheme: dark) {
+  .astro-code,
+  .astro-code span {
+    color: var(--shiki-dark) !important;
+  }
+}
+
 .prose blockquote {
   margin: 0 0 1.1rem;
   padding-left: 1rem;
